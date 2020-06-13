@@ -37,6 +37,7 @@ int main()
   //Read Encoded Text
   unsigned char ectext[500];
   reader = fopen("encodedText.txt", "r");
+  remove("newDummy.txt");
 
   while (!feof(reader))
   {
@@ -61,15 +62,21 @@ int main()
       j++;
     }
     unsigned char *result = decode(numptr, i / 2, keyPtr);
-    printf("%s", result);
+
+    //Write to newDummy.txt
+    FILE *writer;
+
+    writer = fopen("newDummy.txt", "ab+");
+
+    fprintf(writer, result);
+
     if (result[StringLength(result) - 1] != '\n' && !feof(reader))
     {
-      printf("\n");
+      fprintf(writer, "\n");
     }
-    //free(numptr);
+    fclose(writer);
   }
   fclose(reader);
-  printf("\n");
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Deciphering Time: %f\n", time_spent);
