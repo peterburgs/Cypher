@@ -1,1 +1,29 @@
-123
+FILE *pFile = fopen(your_file_path, "r");
+int nbytes = 1024;
+char *line = (char *) malloc(nbytes);
+char *buf = (char *) malloc(nbytes);
+
+size_t bytes_read;
+int linesize = 0;
+while (fgets(buf, nbytes, pFile) != NULL) {
+    bytes_read = strlen(buf);
+    // if line length larger than size of line buffer
+    if (linesize + bytes_read > nbytes) {
+        char *tmp = line;
+        nbytes += nbytes / 2;
+        line = (char *) malloc(nbytes);
+        memcpy(line, tmp, linesize);
+        free(tmp);
+    }
+    memcpy(line + linesize, buf, bytes_read);
+    linesize += bytes_read;
+
+    if (feof(pFile) || buf[bytes_read-1] == '\n') {
+        handle_line(line);
+        linesize = 0;
+        memset(line, '\0', nbytes);
+    }
+}
+
+free(buf);
+free(line);

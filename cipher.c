@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 extern unsigned char *encode();
 
@@ -14,16 +15,19 @@ int StringLength(char *s)
   }
   return i;
 }
-
 int main()
 {
+  //Timer
+  clock_t begin = clock();
+
+  int STR_LEN;
   //Read Keys from file
   FILE *reader;
   reader = fopen("key.txt", "r");
-  char keys[30];
+  char keys[9];
   while (!feof(reader))
   {
-    fgets(keys, 30, reader);
+    fgets(keys, 9, reader);
   }
   fclose(reader);
 
@@ -31,24 +35,29 @@ int main()
   char *keyPtr = &keys;
 
   //Read Plain Text
-  unsigned char pltext[255];
+  unsigned char pltext[500];
+
   reader = fopen("dummy.txt", "r");
+  remove("encodedText.txt");
+
   while (!feof(reader))
   {
-    fgets(pltext, 255, reader);
+    fgets(pltext, 500, reader);
     fflush(stdin);
-
+    STR_LEN = StringLength(pltext);
     unsigned char *result = "";
-    //Encode here:
-    // if(StringLength(pltext)%2==1)
-    // {
-    //     pltext[StringLength(pltext)]=" ";
-    //     pltext[StringLength(pltext)+1]="\n";
-    // }
-    result = encode(pltext, StringLength(pltext), keyPtr);
+    //Padding last line
+    if (feof(reader))
+    {
+      pltext[StringLength(pltext)] = ' ';
+      STR_LEN++;
+    }
+
+    result = encode(pltext, STR_LEN, keyPtr);
+
     FILE *reader1 = fopen("encodedText.txt", "ab+");
 
-    for (int i = 0; i < StringLength(pltext); i++)
+    for (int i = 0; i < STR_LEN; i++)
     {
       fprintf(reader1, "%02x", *(result + i));
     }
@@ -58,7 +67,11 @@ int main()
     }
     fclose(reader1);
   }
+
   fclose(reader);
 
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Ciphering Time: %f\n", time_spent);
   return 0;
 }

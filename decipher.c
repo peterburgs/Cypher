@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <time.h>
 extern unsigned char *decode();
 
 int StringLength(char *s)
@@ -14,8 +14,13 @@ int StringLength(char *s)
   }
   return i;
 }
+
 int main()
 {
+  //Timer
+
+  clock_t begin = clock();
+
   //Read Keys from file
   FILE *reader;
   reader = fopen("key.txt", "r");
@@ -23,24 +28,23 @@ int main()
   while (!feof(reader))
   {
     fgets(keys, 30, reader);
+    fflush(stdin);
   }
   fclose(reader);
   //Pointer of Keys
-  char *keyPtr = &keys;
+  char *keyPtr = &keys[0];
 
   //Read Encoded Text
-  unsigned char ectext[255];
+  unsigned char ectext[500];
   reader = fopen("encodedText.txt", "r");
+
   while (!feof(reader))
   {
-    fgets(ectext, 255, reader);
-
+    fgets(ectext, 500, reader);
+    fflush(stdin);
     //Decode here:
     //Store
-    int length = sizeof(ectext) / sizeof(ectext[0]);
-    fflush(stdin);
-
-    short int num[255];
+    short int num[500];
     int *numptr = &num;
     int j = 0;
     int i;
@@ -62,8 +66,12 @@ int main()
     {
       printf("\n");
     }
+    //free(numptr);
   }
   fclose(reader);
-
+  printf("\n");
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Deciphering Time: %f\n", time_spent);
   return 0;
 }
